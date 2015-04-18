@@ -18,6 +18,8 @@ cat >/etc/apache2/sites-available/000-default.conf <<EOL
 	</Directory>
 </VirtualHost>
 EOL
+sed -i "s/error_reporting = .*/error_reporting = E_ALL/" /etc/php5/apache2/php.ini
+sed -i "s/display_errors = .*/display_errors = On/" /etc/php5/apache2/php.ini
 service apache2 restart
 SETUP
 
