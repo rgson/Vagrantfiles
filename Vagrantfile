@@ -34,4 +34,5 @@ Vagrant.configure("2") do |config|
   config.vm.network :forwarded_port, host: 8080, guest: 80
   config.vm.synced_folder ".", "/vagrant", :mount_options => ["dmode=777","fmode=666"]
   config.vm.hostname = "vagrant"
+# config.ssh.insert_key = false  # Necessary for boxes kept on NTFS drives.
 end
