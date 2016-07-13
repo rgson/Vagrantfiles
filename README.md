@@ -1,2 +1,2 @@
-# vagrantbox-lamp
-Vagrant configuration file for web development using the LAMP stack on Ubuntu 14.04 (64 bit).
+# Vagrantfiles
+A collection of basic `Vagrantfile`s, used as templates for setting up new projects.
