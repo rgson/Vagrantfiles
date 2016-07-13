@@ -1,0 +1,38 @@
+$setup = <<SETUP
+sudo -i
+cat >/etc/apt/sources.list.d/php7.list <<EOL
+deb http://packages.dotdeb.org jessie all
+deb-src http://packages.dotdeb.org jessie all
+EOL
+wget https://www.dotdeb.org/dotdeb.gpg
+apt-key add dotdeb.gpg
+rm dotdeb.gpg
+apt-get update
+apt-get install -y apache2 php7.0 libapache2-mod-php7.0
+a2enmod rewrite
+cat >/etc/apache2/sites-available/000-default.conf <<EOL
+<VirtualHost *:80>
+	DocumentRoot /var/www/html
+	ErrorLog /var/log/apache2/error.log
+	CustomLog /var/log/apache2/access.log combined
+	<Directory /var/www/html >
+		AllowOverride All
+		Require all granted
+	</Directory>
+</VirtualHost>
+EOL
+sed -i "s/error_reporting = .*/error_reporting = E_ALL/" /etc/php/7.0/apache2/php.ini
+sed -i "s/display_errors = .*/display_errors = On/" /etc/php/7.0/apache2/php.ini
+rm -rf /var/www/html
+ln -fs /vagrant/public /var/www/html
+service apache2 restart
+SETUP
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "debian/jessie64"
+  config.vm.provision "shell", inline: $setup
+  config.vm.network :forwarded_port, host: 8080, guest: 80
+  config.vm.synced_folder ".", "/vagrant", :mount_options => ["dmode=777","fmode=666"]
+  config.vm.hostname = "vagrant"
+# config.ssh.insert_key = false  # Necessary for boxes kept on NTFS drives.
+end
