@@ -1,0 +1,24 @@
+$setup = <<SETUP
+sudo -i
+apt-get update
+apt-get install -y npm nodejs-legacy
+npm install -g elm
+wget https://github.com/avh4/elm-format/releases/download/0.4.0-alpha/elm-format-0.17-0.4.0-alpha-linux-x64.tgz
+tar xzvf elm-format-0.17-0.4.0-alpha-linux-x64.tgz
+mv elm-format /usr/local/bin/
+rm elm-format-0.17-0.4.0-alpha-linux-x64.tgz
+SETUP
+
+$start = <<START
+cd /vagrant
+nohup elm reactor -a 0.0.0.0 -p 8000 >/dev/null 2>&1 &
+START
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/trusty64"
+  config.vm.provision "shell", inline: $setup
+  config.vm.provision "shell", inline: $start, run: "always", privileged: false
+  config.vm.network :forwarded_port, host: 8000, guest: 8000
+  config.vm.synced_folder ".", "/vagrant", :mount_options => ["dmode=777","fmode=666"]
+  config.vm.hostname = "vagrant"
+end
