@@ -1,0 +1,30 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "bento/ubuntu-17.10"
+  config.vm.synced_folder ".", "/vagrant"
+
+  config.vm.provision "shell", privileged: false, inline: <<-SHELL
+    cd /tmp
+
+    # Download golang
+    go_tar=go1.9.2.linux-amd64.tar.gz
+    wget https://redirector.gvt1.com/edgedl/go/$go_tar
+
+    # Verify tarball checksum
+    checksum=de874549d9a8d8d8062be05808509c09a88a248e77ec14eb77453530829ac02b
+    if ! sha256sum $go_tar | grep $checksum >/dev/null; then
+      echo "Checksum mismatch: $go_tar" >&2
+      die
+    fi
+
+    # Install golang
+    sudo tar -C /usr/local -xzf $go_tar
+    echo 'export PATH="$PATH:/usr/local/go/bin"' >> ~/.bashrc
+
+    # Set up go workspace
+    mkdir -p ~/go/src/rgson.se
+    ln -s /vagrant ~/go/src/rgson.se/my-project    # TODO: Change this!
+  SHELL
+end
